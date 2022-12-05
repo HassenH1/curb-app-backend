@@ -5,7 +5,6 @@ const userProfileSchema = new Schema(
   {
     username: { type: String, unique: true },
     password: { type: String },
-    // password: { type: String, select: false },
     email: { type: String, unique: true },
     firstName: String,
     lastName: String,
@@ -18,14 +17,11 @@ const userProfileSchema = new Schema(
   { _id: false }
 );
 
-const userCarSchema = new Schema(
-  {
-    licensePlateNumber: String,
-    carModel: String,
-    default: Boolean,
-  },
-  { _id: false }
-);
+const userCarSchema = new Schema({
+  licensePlateNumber: String,
+  carModel: String,
+  default: Boolean,
+});
 
 const userSchema = new Schema({
   profile: userProfileSchema,
