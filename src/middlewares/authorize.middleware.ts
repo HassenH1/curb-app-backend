@@ -12,7 +12,6 @@ export const authenticateJWT = async (
   }
   try {
     const verified = await verifyToken(token);
-    // console.log(verified, "<---verified?")
     next();
   } catch (error) {
     return res.status(400).send({ message: "Unauthorized: Invalid token" });
