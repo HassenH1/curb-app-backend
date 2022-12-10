@@ -9,7 +9,7 @@ class Authentication {
       const { username, password } = req.body;
       const userData = await User.findOne({ "profile.username": username });
 
-      if (!userData) return res.status(401).send({ error: "cannot login" });
+      if (!userData) return res.status(401).send({ error: "user not found" });
 
       const passwordsMatch = await comparePasswords(
         password,
@@ -17,11 +17,12 @@ class Authentication {
       );
 
       if (!passwordsMatch)
-        return res.status(401).send({ error: "cannot login" });
+        return res.status(401).send({ error: "username/password not wrong" });
 
       const token = generateAccessToken({ username, password });
 
-      if (!token) return res.status(400).send({ error: "cannot login" });
+      if (!token)
+        return res.status(400).send({ error: "cannot generate token" });
 
       return res
         .cookie("token", token, {

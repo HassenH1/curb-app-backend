@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoute from "./src/routes/auth.route";
+import updateRoute from "./src/routes/update.route";
 import errorHandler from "./src/middlewares/errorhandler.middleware";
 dotenv.config();
 import "./src/db/connection";
@@ -10,6 +11,7 @@ import { authenticateJWT } from "./src/middlewares/authorize.middleware";
 
 const app: Express = express();
 const port = process.env.PORT;
+const url = "/api/v1";
 
 app.use(cookieParser());
 
@@ -28,17 +30,17 @@ app.use(
     extended: true,
   })
 );
+app.use(errorHandler);
 
-app.use("/api/v1/auth", authRoute);
+app.use(`${url}/update`, updateRoute);
+app.use(`${url}/auth`, authRoute);
 
+/**
+ * @todo - remove this, its only a test
+ */
 app.get("/test", authenticateJWT, (req, res, next) => {
   res.send("need authorization to access this: Success!");
 });
-
-/**
- * @todo - check if this ever hits
- */
-app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);

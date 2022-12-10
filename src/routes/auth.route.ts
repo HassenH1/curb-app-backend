@@ -2,7 +2,7 @@ import express, { Router, Request, Response, NextFunction } from "express";
 import {
   loginValidationRules,
   signupValidationRules,
-} from "../middlewares/authValidationRules.middleware";
+} from "../middlewares/validationRules.middleware";
 import validate from "../middlewares/validate.middleware";
 import AuthService from "../services/auth/auth";
 
@@ -13,15 +13,15 @@ const router: Router = express.Router();
  */
 router.post(
   "/login",
-  loginValidationRules(),
-  validate,
+  // loginValidationRules,
+  // validate,
   (req: Request, res: Response, next: NextFunction) =>
     AuthService.login(req, res, next)
 );
 
 router.post(
   "/signup",
-  signupValidationRules(),
+  signupValidationRules,
   validate,
   (req: Request, res: Response, next: NextFunction) =>
     AuthService.signup(req, res, next)
