@@ -13,19 +13,15 @@ const router: Router = express.Router();
  */
 router.post(
   "/login",
-  // loginValidationRules,
-  // validate,
-  (req: Request, res: Response, next: NextFunction) =>
-    AuthService.login(req, res, next)
-);
+  loginValidationRules(),
+  validate,
+  (req: Request, res: Response, next: NextFunction) => AuthService.login(req, res, next));
 
 router.post(
   "/signup",
-  signupValidationRules,
+  signupValidationRules(),
   validate,
-  (req: Request, res: Response, next: NextFunction) =>
-    AuthService.signup(req, res, next)
-);
+  (req: Request, res: Response, next: NextFunction) => AuthService.signup(req, res, next));
 
 router.get("/logout", (req, res, next) => AuthService.logout(req, res, next));
 

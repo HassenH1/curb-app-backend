@@ -1,4 +1,5 @@
 export interface IGenerateToken {
-  username: string;
+  // email?: string;
+  [key: string]: string
   password: string;
 }

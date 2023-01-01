@@ -31,9 +31,12 @@ app.use(
   })
 );
 app.use(errorHandler);
-
 app.use(`${url}/update`, updateRoute);
 app.use(`${url}/auth`, authRoute);
+
+app.get("/", (req, res) => {
+  res.json({ message: "testing response" })
+})
 
 /**
  * @todo - remove this, its only a test

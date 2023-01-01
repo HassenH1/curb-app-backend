@@ -3,23 +3,26 @@ import User from "../../models/user/user.model";
 import { comparePasswords, hashPassword } from "../bcrypt/bcrypt.service";
 import { generateAccessToken } from "../jwt/jwt.service";
 
+/**
+ * @todo - remove token thats being passed 
+ */
 class Authentication {
   login = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { username, password } = req.body;
-      const userData = await User.findOne({ "profile.username": username });
+      const { email, password } = req.body;
+      const data = await User.findOne({ "profile.email": email });
 
-      if (!userData) return res.status(401).send({ error: "user not found" });
+      if (!data) return res.status(401).send({ error: "email/password does not match" });
 
       const passwordsMatch = await comparePasswords(
         password,
-        userData?.profile?.password as string
+        data?.profile?.password as string
       );
 
       if (!passwordsMatch)
-        return res.status(401).send({ error: "username/password not wrong" });
+        return res.status(401).send({ error: "email/password does not match" });
 
-      const token = generateAccessToken({ username, password });
+      const token = generateAccessToken({ email, password });
 
       if (!token)
         return res.status(400).send({ error: "cannot generate token" });
@@ -31,13 +34,13 @@ class Authentication {
           // sameSite: true
         })
         .status(201)
-        .send({ userData });
+        .send({ data, token });
     } catch (error: any) {
       throw new Error(error);
     }
   };
 
-  signup = (req: Request, res: Response, next: NextFunction) => {
+  signup = async (req: Request, res: Response, next: NextFunction) => {
     const hash = hashPassword(req.body.password);
 
     const userProfile = new User({
@@ -47,25 +50,20 @@ class Authentication {
       },
     });
 
-    userProfile.save((saveErr, savedUser) => {
-      if (saveErr) {
-        res.status(500).send({ error: saveErr });
-      } else {
-        const username = req.body.username;
-        const password = req.body.password;
-        const token = generateAccessToken({ username, password });
-
-        if (!token) return res.status(400).send({ error: "cannot login" });
-
-        return res
-          .cookie("token", token, {
-            // httpOnly: true,
-            // secure: true,
-            // sameSite: true
-          })
-          .status(201)
-          .send({ savedUser });
-      }
+    userProfile.save(function (err, data) {
+      if (err) return res.status(500).json({ err });
+      const username = req.body.username;
+      const password = req.body.password;
+      const token = generateAccessToken({ username, password });
+      if (!token) return res.status(400).send({ error: "cannot generate token" });
+      return res
+        .cookie("token", token, {
+          // httpOnly: true,
+          // secure: true,
+          // sameSite: true
+        })
+        .status(201)
+        .json({ data, token });
     });
   };
 
