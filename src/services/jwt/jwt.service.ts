@@ -1,32 +1,28 @@
-import jwt from "jsonwebtoken";
-import { IGenerateToken } from "./types";
+import jwt from 'jsonwebtoken'
+import { IGenerateToken } from './types'
 
 /**
  * @todo - update token secret
  * @todo - include more options for jwt.sign
  */
-export const generateAccessToken = (payload: IGenerateToken) => {
+export const generateAccessToken = async (payload: IGenerateToken) => {
   try {
     const token = jwt.sign(payload, process.env.TOKEN_SECRET as string, {
-      expiresIn: "1800s",
-    });
-    return token;
+      expiresIn: '1800s',
+    })
+    return token
   } catch (error: any) {
-    throw new Error(error);
+    throw new Error(error)
   }
-};
+}
 
-export const verifyToken = (token: string) => {
-  try {
-    const decoded = jwt.verify(token, process.env.TOKEN_SECRET as string);
-    return decoded;
-  } catch (error: any) {
-    throw new Error(error);
-  }
-};
+export const verifyToken = async (token: string) => {
+  const isVerified = await jwt.verify(token, process.env.TOKEN_SECRET as string)
+  return isVerified
+}
 
 /**
- * 
+ *
  * @todo - might want to remove this
  */
-export const destroyToken = (token: string) => {} 
+export const destroyToken = (token: string) => { }
