@@ -24,3 +24,9 @@ export const verifyToken = (token: string) => {
     throw new Error(error);
   }
 };
+
+/**
+ * 
+ * @todo - might want to remove this
+ */
+export const destroyToken = (token: string) => {} 

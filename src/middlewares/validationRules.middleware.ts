@@ -13,17 +13,24 @@ const signupValidationRules = () => {
     body("password").isLength({ min: 5 }).not().isEmpty().trim(),
     body("firstName").not().isEmpty().trim(),
     body("lastName").not().isEmpty().trim(),
-    body("address").not().isEmpty().trim(),
     body("phoneNumber").not().isEmpty().trim(),
-    body("dob").not().isEmpty().trim(),
-    body("age").not().isEmpty().isNumeric().trim(),
   ];
 };
 
 const loginValidationRules = () => {
   return [
-    body("username").not().isEmpty().trim(),
-    body("password").isLength({ min: 5 }).not().isEmpty().trim(),
+    body("email").isEmail()
+      .normalizeEmail()
+      .withMessage("Invalid")
+      .not()
+      .isEmpty()
+      .trim()
+      .withMessage("Cannot be empty"),
+    body("password").isLength({ min: 5 })
+      .withMessage("min length of 5 characters")
+      .not().isEmpty()
+      .trim()
+      .withMessage("Cannot be empty"),
   ];
 };
 
