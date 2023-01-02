@@ -1,17 +1,17 @@
-import mongoose from "mongoose";
-const { Schema } = mongoose;
+import mongoose from 'mongoose'
+const { Schema } = mongoose
 
 const Point = new mongoose.Schema({
   type: {
     type: String,
-    enum: ["Point"],
+    enum: ['Point'],
     required: true,
   },
   coordinates: {
     type: [Number],
     required: true,
   },
-});
+})
 
 const userProfileSchema = new Schema(
   {
@@ -38,19 +38,22 @@ const userProfileSchema = new Schema(
     dob: String,
   },
   { _id: false }
-);
+)
 
 const userCarSchema = new Schema({
   licensePlateNumber: String,
   carModel: String,
   default: Boolean,
-});
+})
 
-const userSchema = new Schema({
-  profile: userProfileSchema,
-  cars: [userCarSchema],
-}, { timestamps: true });
+const userSchema = new Schema(
+  {
+    profile: userProfileSchema,
+    cars: [userCarSchema],
+  },
+  { timestamps: true }
+)
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model('User', userSchema)
 
-export default User;
+export default User
