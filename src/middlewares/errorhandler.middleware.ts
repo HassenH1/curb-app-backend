@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response } from 'express'
 
 const errorHandler = (
   error: Record<string, number>,
@@ -6,9 +6,9 @@ const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  const statusCode: number = error.statusCode || 500;
-  console.error(error.message, error.stack);
-  return res.status(statusCode).json({ message: error.message });
-};
+  const statusCode: number = error.statusCode || 500
+  console.error(error.message, error.stack)
+  return res.status(statusCode).json({ message: error.message })
+}
 
-export default errorHandler;
+export default errorHandler

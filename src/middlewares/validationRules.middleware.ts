@@ -1,38 +1,41 @@
-import { body, check, oneOf } from "express-validator";
+import { body, check, oneOf } from 'express-validator'
 
 const signupValidationRules = () => {
   return [
-    body("username").not().isEmpty().trim().withMessage("Must be unique"),
-    body("email")
+    body('username').not().isEmpty().trim().withMessage('Must be unique'),
+    body('email')
       .isEmail()
       .normalizeEmail()
       .not()
       .isEmpty()
       .trim()
-      .withMessage("Must be unique"),
-    body("password").isLength({ min: 5 }).not().isEmpty().trim(),
-    body("firstName").not().isEmpty().trim(),
-    body("lastName").not().isEmpty().trim(),
-    body("phoneNumber").not().isEmpty().trim(),
-  ];
-};
+      .withMessage('Must be unique'),
+    body('password').isLength({ min: 5 }).not().isEmpty().trim(),
+    body('firstName').not().isEmpty().trim(),
+    body('lastName').not().isEmpty().trim(),
+    body('phoneNumber').not().isEmpty().trim(),
+  ]
+}
 
 const loginValidationRules = () => {
   return [
-    body("email").isEmail()
+    body('email')
+      .isEmail()
       .normalizeEmail()
-      .withMessage("Invalid")
+      .withMessage('Invalid')
       .not()
       .isEmpty()
       .trim()
-      .withMessage("Cannot be empty"),
-    body("password").isLength({ min: 5 })
-      .withMessage("min length of 5 characters")
-      .not().isEmpty()
+      .withMessage('Cannot be empty'),
+    body('password')
+      .isLength({ min: 5 })
+      .withMessage('min length of 5 characters')
+      .not()
+      .isEmpty()
       .trim()
-      .withMessage("Cannot be empty"),
-  ];
-};
+      .withMessage('Cannot be empty'),
+  ]
+}
 
 // const updateProfileValidationRules = () => {
 //   return [
@@ -54,4 +57,4 @@ export {
   signupValidationRules,
   loginValidationRules,
   // updateProfileValidationRules,
-};
+}

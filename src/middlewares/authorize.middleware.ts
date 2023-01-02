@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import { verifyToken } from "../services/jwt/jwt.service";
+import { Request, Response, NextFunction } from 'express'
+import { verifyToken } from '../services/jwt/jwt.service'
 
 export const authenticateJWT = async (
   req: Request,
@@ -7,12 +7,18 @@ export const authenticateJWT = async (
   next: NextFunction
 ) => {
   try {
-    const token = req.headers["authorization"]?.trim()?.split(" ")[1];
-    if (!token || token === undefined) return res.status(401).send({ message: "Unauthorized: No token provided" });
-    const verified = await verifyToken(token);
-    if(!verified) return res.status(400).send({ message: "Unauthorized: Cannot/not verified" })
-    next();
+    const token = req.headers['authorization']?.trim()?.split(' ')[1]
+    if (!token || token === undefined)
+      return res
+        .status(401)
+        .send({ message: 'Unauthorized: No token provided' })
+    const verified = await verifyToken(token)
+    if (!verified)
+      return res
+        .status(400)
+        .send({ message: 'Unauthorized: Cannot/not verified' })
+    next()
   } catch (error) {
-    return res.status(403).send({ message: "Unauthorized: Invalid token" });
+    return res.status(403).send({ message: 'Unauthorized: Invalid token' })
   }
-};
+}
