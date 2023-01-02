@@ -42,7 +42,7 @@ app.get("/", (req, res) => {
  * @todo - remove this, its only a test
  */
 app.get("/test", authenticateJWT, (req, res, next) => {
-  res.send("need authorization to access this: Success!");
+  res.send("you can access protected route! Success!");
 });
 
 app.listen(port, () => {

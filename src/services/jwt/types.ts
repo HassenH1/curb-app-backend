@@ -1,5 +1,6 @@
+import { Types } from "mongoose";
+
 export interface IGenerateToken {
-  // email?: string;
-  [key: string]: string
-  password: string;
+  // _id: string
+  _id: Types.ObjectId
 }
