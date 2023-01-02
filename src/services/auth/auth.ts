@@ -56,8 +56,12 @@ class Authentication {
     });
   };
 
+  /**
+   * 
+   * @todo - might want to remove this
+   */
   logout = (req: Request, res: Response, next: NextFunction) => {
-    return res.status(200).send({ message: "user is logged out", status: 200 });
+    return res.status(200).send({ message: "user is logged out" });
     // res.cookie("token", undefined, {
       // expires: new Date(Date.now() + 10 * 1000),
       // httpOnly: true,
@@ -77,7 +81,7 @@ class Authentication {
         const data = await User.findOne({ "_id": (verified as JwtPayload)._id });
         return res.status(201).json({ data });
       } catch (error) {
-        return res.status(400).send({ message: "Unauthorized: Invalid token" });
+        return res.status(403).send({ message: "Unauthorized: Invalid token" });
       }
   }
 }
