@@ -8,7 +8,7 @@ import { IGenerateToken } from './types'
 export const generateAccessToken = async (payload: IGenerateToken) => {
   try {
     const token = jwt.sign(payload, process.env.TOKEN_SECRET as string, {
-      expiresIn: '1800s',
+      expiresIn: 2 * 60 * 60 * 1000,
     })
     return token
   } catch (error: any) {
@@ -21,8 +21,3 @@ export const verifyToken = async (token: string) => {
   return isVerified
 }
 
-/**
- *
- * @todo - might want to remove this
- */
-export const destroyToken = (token: string) => { }
