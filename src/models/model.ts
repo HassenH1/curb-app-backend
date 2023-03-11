@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+
 const { Schema } = mongoose
 
 const Point = new mongoose.Schema({
@@ -40,7 +41,7 @@ const userProfileSchema = new Schema(
   { _id: false }
 )
 
-const userCarSchema = new Schema({
+const carSchema = new mongoose.Schema({
   licensePlateNumber: String,
   carModel: String,
   default: Boolean,
@@ -49,11 +50,14 @@ const userCarSchema = new Schema({
 const userSchema = new Schema(
   {
     profile: userProfileSchema,
-    cars: [userCarSchema],
+    car: [{ type: mongoose.Types.ObjectId, ref: 'Car' }],
   },
   { timestamps: true }
 )
 
-const User = mongoose.model('User', userSchema)
+const models = {
+  Car: mongoose.model('Car', carSchema),
+  User: mongoose.model('User', userSchema),
+}
 
-export default User
+export default models

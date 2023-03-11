@@ -1,10 +1,20 @@
 import { Request, Response, NextFunction } from 'express'
-import User from '../../models/user/user.model'
+import models from '../../models/model'
 
-class Car {
+class CarService {
+  getCars = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      console.log('HITTING HERE')
+      const cars = await models.Car.find({})
+      console.log('GOT ALL THE CARS AND NOW SENDING!!')
+      res.status(200).json({ cars })
+    } catch (error) {
+      throw new Error(`${error} error getting cars`)
+    }
+  }
   getACar = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      User.findOne({ _id: req.params.userId }, (err: any, user: any) => {
+      models.User.findOne({ _id: req.params.carId }, (err: any, user: any) => {
         if (err) return res.status(400).json(err)
         const test = user.cars.id(req.params.carId)
         return res.status(200).json(test)
@@ -15,32 +25,27 @@ class Car {
   }
   addCar = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const data = await User.findOne({ _id: req.body._id })
-      data?.cars.push({
-        licensePlateNumber: req.body.licensePlateNumber,
-        carModel: req.body.carModel,
-        default: req.body.default || false,
+      const addCar = new models.Car({ ...req.body })
+      addCar.save((error, data) => {
+        if (error) return res.status(500).json({ error })
+        return res.status(201).json({ data })
       })
-
-      const updated = await data?.save()
-      res.status(200).json(updated?.cars)
     } catch (error) {
       throw new Error(`${error} adding car`)
     }
   }
   deleteCar = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      User.findByIdAndUpdate(
-        { _id: req.params.userId },
-        { $pull: { cars: { _id: req.params.carId } } },
-        { safe: true, new: true },
-        (err, result) => {
-          if (err) {
-            return res.status(400).json(err)
-          }
-          return res.status(200).json(result?.cars)
-        }
-      )
+      console.log(req.params, '<===waht is parms?')
+      models.Car.deleteOne({ _id: req.params.carId })
+        .then(() => {
+          console.log('delete was successful')
+          res.status(200).send('success')
+        })
+        .catch(() => {
+          console.log('delete was not successful')
+          res.status(400).send('failed')
+        })
     } catch (error) {
       throw new Error(`${error} delete car`)
     }
@@ -49,11 +54,7 @@ class Car {
     try {
     } catch (error) {}
   }
-  // getCars = async (req: Request, res: Response, next: NextFunction) => {
-  //   try {
-  //   } catch (error) {}
-  // }
 }
 
-const CarService = new Car()
-export default CarService
+const carService = new CarService()
+export default carService
