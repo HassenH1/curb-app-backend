@@ -4,6 +4,7 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import authRoute from './src/routes/auth.route'
 import updateRoute from './src/routes/update.route'
+import carRoute from './src/routes/car.route'
 import errorHandler from './src/middlewares/errorhandler.middleware'
 dotenv.config()
 import './src/db/connection'
@@ -33,6 +34,7 @@ app.use(
 app.use(errorHandler)
 app.use(`${url}/update`, updateRoute)
 app.use(`${url}/auth`, authRoute)
+app.use(`${url}/car`, carRoute)
 
 app.get('/', (req, res) => {
   res.json({ message: 'testing response' })
