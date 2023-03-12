@@ -1,7 +1,9 @@
 import mongoose from 'mongoose'
+import { ICar, IUser, IUserProfile, IPoint } from './type'
+
 const { Schema } = mongoose
 
-const Point = new mongoose.Schema({
+const Point = new mongoose.Schema<IPoint>({
   type: {
     type: String,
     enum: ['Point'],
@@ -13,7 +15,7 @@ const Point = new mongoose.Schema({
   },
 })
 
-const userProfileSchema = new Schema(
+const userProfileSchema = new Schema<IUserProfile>(
   {
     username: { type: String, unique: true },
     password: { type: String },
@@ -40,20 +42,23 @@ const userProfileSchema = new Schema(
   { _id: false }
 )
 
-const userCarSchema = new Schema({
+const carSchema = new Schema<ICar>({
   licensePlateNumber: String,
   carModel: String,
   default: Boolean,
+  userId: { type: mongoose.Types.ObjectId, ref: 'User' },
 })
 
-const userSchema = new Schema(
+const userSchema = new Schema<IUser>(
   {
     profile: userProfileSchema,
-    cars: [userCarSchema],
   },
   { timestamps: true }
 )
 
-const User = mongoose.model('User', userSchema)
+const models = {
+  Car: mongoose.model<ICar>('Car', carSchema),
+  User: mongoose.model<IUser>('User', userSchema),
+}
 
-export default User
+export default models

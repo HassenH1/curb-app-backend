@@ -3,8 +3,8 @@ import { CallbackError } from 'mongoose'
 import { authenticateJWT } from '../middlewares/authorize.middleware'
 // import validate from "../middlewares/validate.middleware";
 // import { updateProfileValidationRules } from "../middlewares/validationRules.middleware";
-import { IUser } from '../models/user/type'
-import User from '../models/user/user.model'
+import { IUser } from '../models/type'
+import models from '../models/model'
 
 const router: Router = express.Router()
 
@@ -20,7 +20,7 @@ router.patch(
   // updateProfileValidationRules,
   // validate,
   async (req, res) => {
-    User.findById(req.body._id, (err: CallbackError, user: any) => {
+    models.User.findById(req.body._id, (err: CallbackError, user: any) => {
       if (err) return res.send(err)
       if (req.body.profile['password']) {
         //add hash logic here

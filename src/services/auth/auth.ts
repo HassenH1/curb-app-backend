@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { JwtPayload } from 'jsonwebtoken'
-import User from '../../models/user/user.model'
+import models from '../../models/model'
+import User from '../../models/model'
 import { comparePasswords, hashPassword } from '../bcrypt/bcrypt.service'
 import { generateAccessToken, verifyToken } from '../jwt/jwt.service'
 
@@ -8,7 +9,7 @@ class Authentication {
   login = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body
-      const data = await User.findOne({ 'profile.email': email })
+      const data = await models.User.findOne({ 'profile.email': email })
 
       if (!data)
         return res.status(401).send({ error: 'email/password does not match' })
@@ -39,7 +40,7 @@ class Authentication {
   signup = async (req: Request, res: Response, next: NextFunction) => {
     const hash = hashPassword(req.body.password)
 
-    const userProfile = new User({
+    const userProfile = new models.User({
       profile: {
         ...req.body,
         password: hash,
@@ -85,7 +86,9 @@ class Authentication {
       const verified = await verifyToken(token)
       if (!verified) return res.status(401).send({ message: 'not verified' })
 
-      const data = await User.findOne({ _id: (verified as JwtPayload)._id })
+      const data = await models.User.findOne({
+        _id: (verified as JwtPayload)._id,
+      })
       return res.status(201).json({ data })
     } catch (error) {
       return res.status(403).send({ error })
