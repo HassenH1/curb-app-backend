@@ -37,8 +37,8 @@ router.post(
 router.patch(
   '/update',
   authenticateJWT,
-  // updateCarValidationRules(),
-  // validate,
+  updateCarValidationRules(),
+  validate,
   (req: Request, res: Response, next: NextFunction) =>
     carService.updateCar(req, res, next)
 )

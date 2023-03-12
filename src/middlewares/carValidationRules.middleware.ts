@@ -19,16 +19,10 @@ const getACarValidationRules = () => {
 
 const updateCarValidationRules = () => {
   return [
-    body('_id').not().isEmpty().trim().withMessage('Cannot be empty'),
-    oneOf([
-      check('licensePlateNumber')
-        .exists()
-        .isLength({ min: 5, max: 9 })
-        .trim()
-        .withMessage('email is required'),
-      check('carModel').exists().trim().withMessage('email is required'),
-      check('default').exists().isBoolean().withMessage('email is required'),
-    ]),
+    body('_id').not().isEmpty().trim().withMessage('Cannot be empty').bail(),
+    body('licensePlateNumber').optional().isLength({ min: 5, max: 9 }).trim(),
+    body('carModel').optional().trim(),
+    body('default').optional().isBoolean(),
   ]
 }
 
