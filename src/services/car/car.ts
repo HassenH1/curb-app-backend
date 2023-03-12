@@ -5,7 +5,7 @@ class CarService {
   getCars = async (req: Request, res: Response, next: NextFunction) => {
     try {
       console.log('HITTING HERE')
-      const cars = await models.Car.find({})
+      const cars = await models.Car.find({ userId: req.params.userId })
       console.log('GOT ALL THE CARS AND NOW SENDING!!')
       res.status(200).json({ cars })
     } catch (error) {

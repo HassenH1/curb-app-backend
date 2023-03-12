@@ -8,7 +8,9 @@ import carService from '../services/car/car'
 
 const router: Router = express.Router()
 
-router.get('/getCars', (req, res, next) => carService.getCars(req, res, next))
+router.get('/getCars/:userId', (req, res, next) =>
+  carService.getCars(req, res, next)
+)
 
 router.get('/:carId', (req: Request, res: Response, next: NextFunction) =>
   carService.getACar(req, res, next)
