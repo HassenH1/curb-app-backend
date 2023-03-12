@@ -1,14 +1,15 @@
 import jwt from 'jsonwebtoken'
-import { IGenerateToken } from './types'
+import { ObjectId } from 'mongoose'
 
 /**
  * @todo - update token secret
  * @todo - include more options for jwt.sign
  */
-export const generateAccessToken = async (payload: IGenerateToken) => {
+export const generateAccessToken = async (payload: { _id: ObjectId }) => {
   try {
     const token = jwt.sign(payload, process.env.TOKEN_SECRET as string, {
-      expiresIn: '5m',
+      expiresIn: '1h',
+      // expiresIn: '5m',
     })
     return token
   } catch (error: any) {
