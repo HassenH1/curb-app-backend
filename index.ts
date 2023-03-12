@@ -3,12 +3,12 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import authRoute from './src/routes/auth.route'
-import updateRoute from './src/routes/update.route'
+import profileRoute from './src/routes/profile.route'
 import carRoute from './src/routes/car.route'
 import errorHandler from './src/middlewares/errorhandler.middleware'
+import { authenticateJWT } from './src/middlewares/authorize.middleware'
 dotenv.config()
 import './src/db/connection'
-import { authenticateJWT } from './src/middlewares/authorize.middleware'
 
 const app: Express = express()
 const port = process.env.PORT
@@ -32,7 +32,7 @@ app.use(
   })
 )
 app.use(errorHandler)
-app.use(`${url}/update`, updateRoute)
+app.use(`${url}/profile`, profileRoute)
 app.use(`${url}/auth`, authRoute)
 app.use(`${url}/car`, carRoute)
 
