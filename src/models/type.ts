@@ -2,17 +2,7 @@ import { ObjectId, SchemaDefinitionProperty } from 'mongoose'
 
 export interface IUser {
   _id: ObjectId
-  profile?: {
-    username: string
-    password: string
-    email: string
-    firstName: string
-    lastName: string
-    address: string
-    phoneNumber: string
-    age: number
-    dob: string
-  }
+  profile?: IUserProfile
 }
 
 export interface IUserProfile {
@@ -52,5 +42,4 @@ export interface ICar {
   carModel: string
   default: boolean
   userId: SchemaDefinitionProperty<ObjectId>
-  // userId: Types.ObjectId
 }

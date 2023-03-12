@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { JwtPayload } from 'jsonwebtoken'
 import models from '../../models/model'
-import User from '../../models/model'
 import { comparePasswords, hashPassword } from '../bcrypt/bcrypt.service'
 import { generateAccessToken, verifyToken } from '../jwt/jwt.service'
 
@@ -22,7 +21,7 @@ class Authentication {
       if (!passwordsMatch)
         return res.status(401).send({ error: 'email/password does not match' })
 
-      const token = await generateAccessToken({ _id: data?._id })
+      const token = await generateAccessToken({ _id: data._id })
       if (!token)
         return res.status(400).send({ error: 'cannot generate token' })
 
@@ -49,7 +48,7 @@ class Authentication {
 
     userProfile.save(async (err, data) => {
       if (err) return res.status(500).json({ err })
-      const token = await generateAccessToken({ _id: data?._id })
+      const token = await generateAccessToken({ _id: data._id })
       if (!token)
         return res.status(400).send({ error: 'cannot generate token' })
       return res.status(201).json({ data, token })

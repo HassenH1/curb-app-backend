@@ -1,4 +1,4 @@
-import { body } from 'express-validator'
+import { body, check, oneOf } from 'express-validator'
 
 const addCarValidationRules = () => {
   return [
@@ -14,7 +14,26 @@ const addCarValidationRules = () => {
 }
 
 const getACarValidationRules = () => {
-  return [body('_id').not().isEmpty().trim().withMessage('Cannot be empty')]
+  return [body('userId').not().isEmpty().trim().withMessage('Cannot be empty')]
 }
 
-export { getACarValidationRules, addCarValidationRules }
+const updateCarValidationRules = () => {
+  return [
+    body('_id').not().isEmpty().trim().withMessage('Cannot be empty'),
+    oneOf([
+      check('licensePlateNumber')
+        .exists()
+        .isLength({ min: 5, max: 9 })
+        .trim()
+        .withMessage('email is required'),
+      check('carModel').exists().trim().withMessage('email is required'),
+      check('default').exists().isBoolean().withMessage('email is required'),
+    ]),
+  ]
+}
+
+export {
+  getACarValidationRules,
+  addCarValidationRules,
+  updateCarValidationRules,
+}
