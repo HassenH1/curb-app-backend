@@ -1,8 +1,6 @@
 import express, { Router } from 'express';
 import { CallbackError } from 'mongoose';
 import { authenticateJWT } from '../middlewares/authorize.middleware';
-// import validate from "../middlewares/validate.middleware";
-// import { updateProfileValidationRules } from "../middlewares/validationRules.middleware";
 import { IUser } from '../models/type';
 import models from '../models/model';
 

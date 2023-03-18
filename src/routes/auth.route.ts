@@ -1,10 +1,10 @@
 import express, { Router, Request, Response, NextFunction } from 'express';
+import AuthService from '../services/auth/auth';
 import {
   loginValidationRules,
   signupValidationRules,
-} from '../middlewares/validationRules.middleware';
-import validate from '../middlewares/validate.middleware';
-import AuthService from '../services/auth/auth';
+} from '../middlewares/rules/validationRules.middleware';
+import validate from '../middlewares/rules/validate.middleware';
 import { authenticateJWT } from '../middlewares/authorize.middleware';
 
 const router: Router = express.Router();
@@ -28,8 +28,14 @@ router.post(
     AuthService.signup(req, res, next)
 );
 
+/**
+ * i dont think i need this either
+ */
 router.get('/logout', (req, res, next) => AuthService.logout(req, res, next));
 
+/**
+ * might remove this here, just using it for testing
+ */
 router.get('/:token', (req, res, next) =>
   AuthService.checkToken(req, res, next)
 );

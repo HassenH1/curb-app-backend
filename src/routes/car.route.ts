@@ -4,8 +4,8 @@ import {
   addCarValidationRules,
   getACarValidationRules,
   updateCarValidationRules,
-} from '../middlewares/carValidationRules.middleware';
-import validate from '../middlewares/validate.middleware';
+} from '../middlewares/rules/carValidationRules.middleware';
+import validate from '../middlewares/rules/validate.middleware';
 import carService from '../services/car/car';
 
 const router: Router = express.Router();
