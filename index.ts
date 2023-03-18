@@ -9,6 +9,7 @@ import errorHandler from './src/middlewares/errorhandler.middleware';
 import { authenticateJWT } from './src/middlewares/authorize.middleware';
 dotenv.config();
 import './src/db/connection';
+import { Mailer } from './src/utils/mailer/mailer.utils';
 
 const app: Express = express();
 const port = process.env.PORT;
@@ -36,7 +37,13 @@ app.use(`${url}/profile`, profileRoute);
 app.use(`${url}/auth`, authRoute);
 app.use(`${url}/car`, carRoute);
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
+  try {
+    const mailerService = new Mailer();
+    await mailerService.setup();
+  } catch (error) {
+    throw new Error(`${error} MAILER SERVICE IN GET ROUTE ERROR`);
+  }
   res.json({ message: 'testing response' });
 });
 
