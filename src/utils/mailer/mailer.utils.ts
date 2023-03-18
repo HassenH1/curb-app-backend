@@ -53,5 +53,11 @@ class Mailer {
     }
   };
 
-  template = async () => {};
+  template = async () => ({
+    from: '"Fred Foo 👻" <curbapp@example.com>', // sender address
+    to: 'customer@example.com', // list of receivers
+    subject: 'Hello ✔', // Subject line
+    text: 'Verify your email address', // plain text body
+    html: '<b>Hello world?</b>', // html body
+  });
 }
