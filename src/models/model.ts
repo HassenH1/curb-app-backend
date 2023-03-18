@@ -1,7 +1,7 @@
-import mongoose from 'mongoose'
-import { ICar, IUser, IUserProfile, IPoint } from './type'
+import mongoose from 'mongoose';
+import { ICar, IUser, IUserProfile, IPoint } from './type';
 
-const { Schema } = mongoose
+const { Schema } = mongoose;
 
 const Point = new mongoose.Schema<IPoint>({
   type: {
@@ -13,7 +13,7 @@ const Point = new mongoose.Schema<IPoint>({
     type: [Number],
     required: true,
   },
-})
+});
 
 const userProfileSchema = new Schema<IUserProfile>(
   {
@@ -40,25 +40,25 @@ const userProfileSchema = new Schema<IUserProfile>(
     dob: String,
   },
   { _id: false }
-)
+);
 
 const carSchema = new Schema<ICar>({
   licensePlateNumber: String,
   carModel: String,
   default: Boolean,
   userId: { type: mongoose.Types.ObjectId, ref: 'User' },
-})
+});
 
 const userSchema = new Schema<IUser>(
   {
     profile: userProfileSchema,
   },
   { timestamps: true }
-)
+);
 
 const models = {
   Car: mongoose.model<ICar>('Car', carSchema),
   User: mongoose.model<IUser>('User', userSchema),
-}
+};
 
-export default models
+export default models;

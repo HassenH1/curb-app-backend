@@ -1,5 +1,5 @@
-import jwt from 'jsonwebtoken'
-import { ObjectId } from 'mongoose'
+import jwt from 'jsonwebtoken';
+import { ObjectId } from 'mongoose';
 
 /**
  * @todo - update token secret
@@ -10,21 +10,21 @@ export const generateAccessToken = async (payload: { _id: ObjectId }) => {
     const token = jwt.sign(payload, process.env.TOKEN_SECRET as string, {
       expiresIn: '1h',
       // expiresIn: '5m',
-    })
-    return token
+    });
+    return token;
   } catch (error: any) {
-    throw new Error(error)
+    throw new Error(error);
   }
-}
+};
 
 export const verifyToken = async (token: string) => {
   try {
     const isVerified = await jwt.verify(
       token,
       process.env.TOKEN_SECRET as string
-    )
-    return isVerified
+    );
+    return isVerified;
   } catch (error) {
-    throw new Error(`${error} verify token`)
+    throw new Error(`${error} verify token`);
   }
-}
+};

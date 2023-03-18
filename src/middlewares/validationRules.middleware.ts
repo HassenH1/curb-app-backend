@@ -1,4 +1,4 @@
-import { body, check, oneOf } from 'express-validator'
+import { body, check, oneOf } from 'express-validator';
 
 const signupValidationRules = () => {
   return [
@@ -14,8 +14,8 @@ const signupValidationRules = () => {
     body('firstName').not().isEmpty().trim(),
     body('lastName').not().isEmpty().trim(),
     body('phoneNumber').not().isEmpty().trim(),
-  ]
-}
+  ];
+};
 
 const loginValidationRules = () => {
   return [
@@ -34,8 +34,8 @@ const loginValidationRules = () => {
       .isEmpty()
       .trim()
       .withMessage('Cannot be empty'),
-  ]
-}
+  ];
+};
 
 // const updateProfileValidationRules = () => {
 //   return [
@@ -57,4 +57,4 @@ export {
   signupValidationRules,
   loginValidationRules,
   // updateProfileValidationRules,
-}
+};
