@@ -1,8 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 import models from '../../models/model';
-import { comparePasswords, hashPassword } from '../bcrypt/bcrypt.service';
-import { generateAccessToken, verifyToken } from '../jwt/jwt.service';
+import {
+  comparePasswords,
+  hashPassword,
+} from '../../utils/bcrypt/bcrypt.utils';
+import { generateAccessToken, verifyToken } from '../../utils/jwt/jwt.utils';
 
 class Authentication {
   login = async (req: Request, res: Response, next: NextFunction) => {
