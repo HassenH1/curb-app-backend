@@ -8,14 +8,12 @@ import nodemailer, {
  * should make variables private
  */
 export class Mailer {
-  emailTo: string = 'hassen@mailinator.com';
-  // emailTo: string = 'hasansaid51@gmail.com';
+  emailTo: string = 'hassen@mailinator.com'; //ethereal doesnt actually email anything
   host: string = 'smtp.ethereal.email';
   port: number = 587;
   testAccount?: TestAccount;
   transporter?: Transporter<SentMessageInfo>;
-  emailTemplate: number | string = 2;
-  // emailTemplate: number | string = 'example';
+  emailTemplate: number | string = 'example';
 
   constructor(host?: string, port?: number, emailTemplate?: number | string) {
     if (host) this.host = host;
@@ -25,7 +23,6 @@ export class Mailer {
 
   setup = async () => {
     try {
-      console.log('HITT SETUP');
       await this.createTestAccount();
       this.transporter = this.createTransport();
       await this.sendMail();
@@ -36,7 +33,6 @@ export class Mailer {
 
   private createTestAccount = async () => {
     try {
-      console.log('HIT CREATE TEST ACOUNT');
       this.testAccount = await nodemailer.createTestAccount();
     } catch (error) {
       throw new Error(`${error} Create test account issue`);
@@ -44,13 +40,9 @@ export class Mailer {
   };
 
   private createTransport = () => {
-    console.log('HITT CREATE TRANSPORT', {
-      user: this.testAccount?.user, // generated ethereal user
-      pass: this.testAccount?.pass, // generated ethereal password
-    });
     return nodemailer.createTransport({
-      host: this.host,
-      port: this.port,
+      host: 'smtp.ethereal.email',
+      port: 587,
       secure: false, // true for 465, false for other ports
       auth: {
         user: this.testAccount?.user, // generated ethereal user
@@ -61,10 +53,10 @@ export class Mailer {
 
   private sendMail = async () => {
     try {
-      console.log('HITT SEND MAIL');
       const template = this.emailVerificationTemplate(this.emailTemplate);
       const info = await this.transporter?.sendMail(template);
 
+      console.log('INFO: ', info);
       console.log('Message sent: %s', info.messageId);
       // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
 
@@ -76,8 +68,7 @@ export class Mailer {
     }
   };
 
-  private emailVerificationTemplate = (templateNum: number | string) => {
-    console.log('HITT EMAIL VERIFICATION TEMPLATE');
+  private emailVerificationTemplate = (templateNum?: number | string) => {
     const html: string = `
     <p>Welcome...</p>
 
@@ -132,11 +123,10 @@ export class Mailer {
 
       default:
         return {
-          from: '"Fred Foo 👻" <curbapp@example.com>', // sender address
-          to: this.emailTo, // list of receivers
-          subject: 'Welcome to Curb! ✔', // Subject line
-          text: 'Verify your email address', // plain text body
-          html: html, // html body
+          from: 'hassen@mailinator.com',
+          to: 'hassen@mailinator.com',
+          subject: 'Sending Email using Node.js',
+          text: 'Wow!',
         };
     }
   };

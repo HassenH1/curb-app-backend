@@ -42,7 +42,7 @@ app.get('/', async (req, res) => {
     const mailerService = new Mailer();
     await mailerService.setup();
   } catch (error) {
-    throw new Error(`${error} MAILER SERVICE IN GET ROUTE ERROR`);
+    console.log(`${error} MAILER SERVICE IN GET ROUTE ERROR`);
   }
   res.json({ message: 'testing response' });
 });
