@@ -9,7 +9,7 @@ import errorHandler from './src/middlewares/errorhandler.middleware';
 import { authenticateJWT } from './src/middlewares/authorize.middleware';
 dotenv.config();
 import './src/db/connection';
-import { Mailer } from './src/utils/mailer/mailer.utils';
+import sendVerificationEmail from './src/utils/mailer/mailer.utils';
 
 const app: Express = express();
 const port = process.env.PORT;
@@ -39,8 +39,10 @@ app.use(`${url}/car`, carRoute);
 
 app.get('/', async (req, res) => {
   try {
-    const mailerService = new Mailer();
-    await mailerService.setup();
+    await sendVerificationEmail({
+      id: Object('3'),
+      email: 'hassen@mailinator.com',
+    });
   } catch (error) {
     console.log(`${error} MAILER SERVICE IN GET ROUTE ERROR`);
   }

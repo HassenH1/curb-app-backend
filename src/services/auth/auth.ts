@@ -6,6 +6,7 @@ import {
   hashPassword,
 } from '../../utils/bcrypt/bcrypt.utils';
 import { generateAccessToken, verifyToken } from '../../utils/jwt/jwt.utils';
+import sendVerificationEmail from '../../utils/mailer/mailer.utils';
 
 class Authentication {
   login = async (req: Request, res: Response, next: NextFunction) => {
@@ -54,6 +55,11 @@ class Authentication {
       const token = await generateAccessToken({ _id: data._id });
       if (!token)
         return res.status(400).send({ error: 'cannot generate token' });
+
+      await sendVerificationEmail({
+        id: data._id,
+        email: data.profile?.email as string,
+      });
       return res.status(201).json({ data, token });
       // .cookie("token", token, {
       // httpOnly: true,
