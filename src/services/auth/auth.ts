@@ -89,7 +89,6 @@ class Authentication {
 
   checkToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log('INSIDE CHECK TOKEN!!!!!!!');
       const token = req.params.token;
       if (!token)
         return res
@@ -97,13 +96,12 @@ class Authentication {
           .send({ message: 'Unauthorized: No token provided' });
 
       const verified = await verifyToken(token);
-      console.log('THE TOKEN HAS BEEN VERIFIED!!!!!! GOOD JOB MAN!');
       if (!verified) return res.status(401).send({ message: 'not verified' });
-      console.log(verified, 'its verfied man!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+
       const data = await models.User.findOne({
         _id: (verified as JwtPayload)._id,
       });
-      console.log();
+
       return res.status(201).json({ data });
     } catch (error) {
       return res.status(403).send({ error });
