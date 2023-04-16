@@ -6,30 +6,31 @@ import {
   hashPassword,
 } from '../../utils/bcrypt/bcrypt.utils';
 import { generateAccessToken, verifyToken } from '../../utils/jwt/jwt.utils';
+import MailService from '../../utils/mailer/mailer.utils';
 import sendVerificationEmail from '../../utils/mailer/mailer.utils';
 
 class Authentication {
   login = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body;
-      const data = await models.User.findOne({ 'profile.email': email });
+      const user = await models.User.findOne({ 'profile.email': email });
 
-      if (!data)
+      if (!user)
         return res.status(401).send({ error: 'email/password does not match' });
 
       const passwordsMatch = await comparePasswords(
         password,
-        data?.profile?.password as string
+        user?.profile?.password as string
       );
 
       if (!passwordsMatch)
         return res.status(401).send({ error: 'email/password does not match' });
 
-      const token = await generateAccessToken({ _id: data._id });
+      const token = await generateAccessToken({ _id: user._id });
       if (!token)
         return res.status(400).send({ error: 'cannot generate token' });
 
-      return res.status(201).json({ data, token });
+      return res.status(201).json({ user, token });
       // .cookie("token", token, {
       // httpOnly: true,
       // secure: true,
@@ -56,10 +57,13 @@ class Authentication {
       if (!token)
         return res.status(400).send({ error: 'cannot generate token' });
 
-      await sendVerificationEmail({
-        id: data._id,
-        email: data.profile?.email as string,
-      });
+      const mail = new MailService(
+        data._id,
+        ((data.profile?.firstName.charAt(0).toUpperCase() as string) +
+          data.profile?.firstName.slice(1)) as string,
+        data.profile?.email as string
+      );
+      mail.sendMail();
       return res.status(201).json({ data, token });
       // .cookie("token", token, {
       // httpOnly: true,
@@ -85,6 +89,7 @@ class Authentication {
 
   checkToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log('INSIDE CHECK TOKEN!!!!!!!');
       const token = req.params.token;
       if (!token)
         return res
@@ -92,11 +97,13 @@ class Authentication {
           .send({ message: 'Unauthorized: No token provided' });
 
       const verified = await verifyToken(token);
+      console.log('THE TOKEN HAS BEEN VERIFIED!!!!!! GOOD JOB MAN!');
       if (!verified) return res.status(401).send({ message: 'not verified' });
-
+      console.log(verified, 'its verfied man!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
       const data = await models.User.findOne({
         _id: (verified as JwtPayload)._id,
       });
+      console.log();
       return res.status(201).json({ data });
     } catch (error) {
       return res.status(403).send({ error });
