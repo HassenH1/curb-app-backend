@@ -5,11 +5,13 @@ import { ObjectId } from 'mongoose';
  * @todo - update token secret
  * @todo - include more options for jwt.sign
  */
-export const generateAccessToken = async (payload: { _id: ObjectId }) => {
+export const generateAccessToken = async (
+  payload: { _id: ObjectId },
+  expiresIn: '1h' | '1m' | '5m' = '1h'
+) => {
   try {
-    const token = jwt.sign(payload, process.env.TOKEN_SECRET as string, {
-      expiresIn: '1h',
-      // expiresIn: '5m',
+    const token = await jwt.sign(payload, process.env.TOKEN_SECRET as string, {
+      expiresIn,
     });
     return token;
   } catch (error: any) {

@@ -1,133 +1,368 @@
-import nodemailer, {
-  TestAccount,
-  Transporter,
-  SentMessageInfo,
-} from 'nodemailer';
+import { ObjectId, Schema } from 'mongoose';
+import nodemailer, { Transporter, SentMessageInfo } from 'nodemailer';
+import { generateAccessToken } from '../jwt/jwt.utils';
 
 /**
- * should make variables private
+ * @todo - remove this when finished
+ * https://github.com/sendgrid/email-templates/blob/master/paste-templates/email-confirmation.html
+ *
+ * https://stackoverflow.com/questions/63821864/authentication-failed-for-nodemailer-w-privateemail-smtp-server
  */
-export class Mailer {
-  emailTo: string = 'hassen@mailinator.com'; //ethereal doesnt actually email anything
-  host: string = 'smtp.ethereal.email';
-  port: number = 587;
-  testAccount?: TestAccount;
-  transporter?: Transporter<SentMessageInfo>;
-  emailTemplate: number | string = 'example';
+export default class MailService {
+  private email: string;
+  private _id: Schema.Types.ObjectId;
+  private name: string;
+  private generatedToken?: string;
+  private link: string = process.env.LINK as string;
+  private shouldGenerateToken?: boolean;
 
-  constructor(host?: string, port?: number, emailTemplate?: number | string) {
-    if (host) this.host = host;
-    if (port) this.port = port;
-    if (emailTemplate) this.emailTemplate = emailTemplate;
+  constructor(
+    _id: Schema.Types.ObjectId,
+    name: string,
+    email: string,
+    shouldGenerateToken: boolean = false
+  ) {
+    this.email = email;
+    this._id = _id;
+    this.name = name;
+    this.shouldGenerateToken = shouldGenerateToken;
   }
 
-  setup = async () => {
+  sendMail = async () => {
     try {
-      await this.createTestAccount();
-      this.transporter = this.createTransport();
-      await this.sendMail();
+      const transporter: Transporter = nodemailer.createTransport({
+        // host: 'smtp.ethereal.email',
+        // port: 587,
+        host: 'mail.privateemail.com',
+        port: 465,
+        secure: true,
+        // secure: false, // true for 465, false for other ports
+        // debug: true,
+        // logger: true,
+        auth: {
+          user: process.env.PRIVATE_EMAIL_USER,
+          pass: process.env.PRIVATE_EMAIL_PASSWORD,
+        },
+      });
+
+      if (this.shouldGenerateToken) {
+        this.generatedToken = await generateAccessToken(
+          { _id: this._id },
+          '1m'
+        );
+        this.link += `api/v1/auth/verify/email/${this.generatedToken}`;
+      }
+
+      await transporter.sendMail({
+        from: `"Welcome to Curb!" <${process.env.PRIVATE_EMAIL_USER}>`, // sender address
+        to: this.email, // list of receivers
+        subject: `Hello ${this.name} ✔`, // Subject line
+        text: 'Welcome to Curb', // plain text body
+        // html: htmlTest,
+        html: this.generateHTMLTemplate(),
+      });
     } catch (error) {
-      throw new Error(`${error} main function issue`);
+      throw new Error(`${error} Mail service error`);
     }
   };
-
-  private createTestAccount = async () => {
-    try {
-      this.testAccount = await nodemailer.createTestAccount();
-    } catch (error) {
-      throw new Error(`${error} Create test account issue`);
-    }
-  };
-
-  private createTransport = () => {
-    return nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: this.testAccount?.user, // generated ethereal user
-        pass: this.testAccount?.pass, // generated ethereal password
-      },
-    });
-  };
-
-  private sendMail = async () => {
-    try {
-      const template = this.emailVerificationTemplate(this.emailTemplate);
-      const info = await this.transporter?.sendMail(template);
-
-      console.log('INFO: ', info);
-      console.log('Message sent: %s', info.messageId);
-      // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-      // Preview only available when sending through an Ethereal account
-      console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-      // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-    } catch (error) {
-      throw new Error(`${error} sendMail issue`);
-    }
-  };
-
-  private emailVerificationTemplate = (templateNum?: number | string) => {
-    const html: string = `
-    <p>Welcome...</p>
-
-    <p>You registered an account on Curb App, before being able to use your account you need to verify that this is your email address by clicking here: [link]</p>
-
-    <p>Kind Regards, Curb!</p>
-  `;
-
-    const html2: string = `
-    <h1>Final step...</h1>
-    <br />
-    Click this button to verify your email address.
-    <br />
-    <a href="#" target="_blank" style="padding: 12px 24px; border-radius: 4px; color: #FFF; background: #2B52F5;display: inline-block;margin: 0.5rem 0;">Confirm now</a>
-    <br />
-    <br />
-    If you didnt ask to verify this address, you can ignore this email.
-    <br />
-    <br />
-    Thanks,
-    <br />
-    The Curb App team
-  `;
-
-    switch (templateNum) {
-      case 1:
-        return {
-          from: '"Fred Foo 👻" <curbapp@example.com>', // sender address
-          to: this.emailTo, // list of receivers
-          subject: 'Welcome to Curb! ✔', // Subject line
-          text: 'Verify your email address', // plain text body
-          html: html, // html body
-        };
-
-      case 2:
-        return {
-          from: '"Fred Foo 👻" <curbapp@example.com>', // sender address
-          to: this.emailTo, // list of receivers
-          subject: 'Welcome to Curb! ✔', // Subject line
-          text: 'Verify your email address', // plain text body
-          html: html2, // html body
-        };
-
-      case 'example':
-        return {
-          from: '"Fred Foo 👻" <foo@example.com>', // sender address
-          to: this.emailTo, // list of receivers
-          subject: 'Hello ✔', // Subject line
-          text: 'Hello world?', // plain text body
-          html: '<b>Hello world?</b>', // html body
-        };
-
-      default:
-        return {
-          from: 'hassen@mailinator.com',
-          to: 'hassen@mailinator.com',
-          subject: 'Sending Email using Node.js',
-          text: 'Wow!',
-        };
-    }
+  generateHTMLTemplate = () => {
+    return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+    
+      <meta charset="utf-8">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      <title>Email Confirmation</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <style type="text/css">
+      /**
+       * Google webfonts. Recommended to include the .woff version for cross-client compatibility.
+       */
+      @media screen {
+        @font-face {
+          font-family: 'Source Sans Pro';
+          font-style: normal;
+          font-weight: 400;
+          src: local('Source Sans Pro Regular'), local('SourceSansPro-Regular'), url(https://fonts.gstatic.com/s/sourcesanspro/v10/ODelI1aHBYDBqgeIAH2zlBM0YzuT7MdOe03otPbuUS0.woff) format('woff');
+        }
+    
+        @font-face {
+          font-family: 'Source Sans Pro';
+          font-style: normal;
+          font-weight: 700;
+          src: local('Source Sans Pro Bold'), local('SourceSansPro-Bold'), url(https://fonts.gstatic.com/s/sourcesanspro/v10/toadOcfmlt9b38dHJxOBGFkQc6VGVFSmCnC_l7QZG60.woff) format('woff');
+        }
+      }
+    
+      /**
+       * Avoid browser level font resizing.
+       * 1. Windows Mobile
+       * 2. iOS / OSX
+       */
+      body,
+      table,
+      td,
+      a {
+        -ms-text-size-adjust: 100%; /* 1 */
+        -webkit-text-size-adjust: 100%; /* 2 */
+      }
+    
+      /**
+       * Remove extra space added to tables and cells in Outlook.
+       */
+      table,
+      td {
+        mso-table-rspace: 0pt;
+        mso-table-lspace: 0pt;
+      }
+    
+      /**
+       * Better fluid images in Internet Explorer.
+       */
+      img {
+        -ms-interpolation-mode: bicubic;
+      }
+    
+      /**
+       * Remove blue links for iOS devices.
+       */
+      a[x-apple-data-detectors] {
+        font-family: inherit !important;
+        font-size: inherit !important;
+        font-weight: inherit !important;
+        line-height: inherit !important;
+        color: inherit !important;
+        text-decoration: none !important;
+      }
+    
+      /**
+       * Fix centering issues in Android 4.4.
+       */
+      div[style*="margin: 16px 0;"] {
+        margin: 0 !important;
+      }
+    
+      body {
+        width: 100% !important;
+        height: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+    
+      /**
+       * Collapse table borders to avoid space between cells.
+       */
+      table {
+        border-collapse: collapse !important;
+      }
+    
+      a {
+        color: #1a82e2;
+      }
+    
+      img {
+        height: auto;
+        line-height: 100%;
+        text-decoration: none;
+        border: 0;
+        outline: none;
+      }
+      </style>
+    
+    </head>
+    <body style="background-color: #e9ecef;">
+    
+      <!-- start preheader -->
+      <div class="preheader" style="display: none; max-width: 0; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">
+        Welcome to The Curb App but it's about that time to verify your email.
+      </div>
+      <!-- end preheader -->
+    
+      <!-- start body -->
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+    
+        <!-- start hero -->
+        <tr>
+          <td align="center" bgcolor="#e9ecef">
+            <!--[if (gte mso 9)|(IE)]>
+            <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
+            <tr>
+            <td align="center" valign="top" width="600">
+            <![endif]-->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+              <tr>
+                <td align="left" bgcolor="#ffffff" style="padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; border-top: 3px solid #d4dadf;">
+                  <h1 style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -1px; line-height: 48px;">Confirm Your Email Address</h1>
+                </td>
+              </tr>
+            </table>
+            <!--[if (gte mso 9)|(IE)]>
+            </td>
+            </tr>
+            </table>
+            <![endif]-->
+          </td>
+        </tr>
+        <!-- end hero -->
+    
+        <!-- start copy block -->
+        <tr>
+          <td align="center" bgcolor="#e9ecef">
+            <!--[if (gte mso 9)|(IE)]>
+            <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
+            <tr>
+            <td align="center" valign="top" width="600">
+            <![endif]-->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+    
+              <!-- start copy -->
+              <tr>
+                <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
+                  <p style="margin: 0;">Tap the button below to confirm your email address. If you didn't create an account with <a href="/">The Curb App</a>, you can safely delete this email.</p>
+                </td>
+              </tr>
+              <!-- end copy -->
+    
+              <!-- start button -->
+              <tr>
+                <td align="left" bgcolor="#ffffff">
+                  <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                      <td align="center" bgcolor="#ffffff" style="padding: 12px;">
+                        <table border="0" cellpadding="0" cellspacing="0">
+                          <tr>
+                            <td align="center" bgcolor="#198754" style="border-radius: 6px;">
+                              <a href="${this.link}" target="_blank" style="display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px;">Verify email</a>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              <!-- end button -->
+    
+              <!-- start copy -->
+              <tr>
+                <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
+                  <p style="margin: 0;">If that doesn't work, copy and paste the following link in your browser:</p>
+                  <p style="margin: 0;"><a href="${this.link}" target="_blank">Click here</a></p>
+                </td>
+              </tr>
+              <!-- end copy -->
+    
+              <!-- start copy -->
+              <tr>
+                <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; border-bottom: 3px solid #d4dadf">
+                  <p style="margin: 0;">Cheers,<br> The Curb App Team</p>
+                </td>
+              </tr>
+              <!-- end copy -->
+    
+            </table>
+            <!--[if (gte mso 9)|(IE)]>
+            </td>
+            </tr>
+            </table>
+            <![endif]-->
+          </td>
+        </tr>
+        <!-- end copy block -->
+    
+        <!-- start footer -->
+        <tr>
+          <td align="center" bgcolor="#e9ecef" style="padding: 24px;">
+            <!--[if (gte mso 9)|(IE)]>
+            <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
+            <tr>
+            <td align="center" valign="top" width="600">
+            <![endif]-->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+    
+              <!-- start permission -->
+              <tr>
+                <td align="center" bgcolor="#e9ecef" style="padding: 12px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: #666;">
+                  <p style="margin: 0;">You received this email because you have signed up for  account on the Curb App. If you didn't register, you can safely delete or ignore this email.</p>
+                </td>
+              </tr>
+              <!-- end permission -->
+    
+            </table>
+            <!--[if (gte mso 9)|(IE)]>
+            </td>
+            </tr>
+            </table>
+            <![endif]-->
+          </td>
+        </tr>
+        <!-- end footer -->
+    
+      </table>
+      <!-- end body -->
+    
+    </body>
+    </html>
+    `;
   };
 }
+
+//////////////////////////////////////////////////////////////////
+
+const logo = `
+<!-- start logo -->
+<tr>
+  <td align="center" bgcolor="#e9ecef">
+    <!--[if (gte mso 9)|(IE)]>
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
+    <tr>
+    <td align="center" valign="top" width="600">
+    <![endif]-->
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+      <tr>
+        <td align="center" valign="top" style="padding: 36px 24px;">
+          <a href="https://sendgrid.com" target="_blank" style="display: inline-block;">
+            <img src="./img/paste-logo-light@2x.png" alt="Logo" border="0" width="48" style="display: block; width: 48px; max-width: 48px; min-width: 48px;">
+          </a>
+        </td>
+      </tr>
+    </table>
+    <!--[if (gte mso 9)|(IE)]>
+    </td>
+    </tr>
+    </table>
+    <![endif]-->
+  </td>
+</tr>
+<!-- end logo -->
+`;
+
+const subscribed = `
+<!-- start unsubscribe -->
+<tr>
+  <td align="center" bgcolor="#e9ecef" style="padding: 12px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: #666;">
+    <p style="margin: 0;">To stop receiving these emails, you can <a href="https://sendgrid.com" target="_blank">unsubscribe</a> at any time.</p>
+    <p style="margin: 0;">Paste 1234 S. Broadway St. City, State 12345</p>
+  </td>
+</tr>
+<!-- end unsubscribe -->
+`;
+
+const test = `<div style="height: 100%; width: 100%; background: #f9f9f9; justify-content: center;">
+<div style="height: auto; width: 50%; background-color: white; margin: 0 auto; padding: 25px; border: 1px solid #E5E4E2; border-radius: 15px">
+  <h1>Confirm Your Email</h1>
+  <p>Hey there, you're almost ready to start enjoying The Curb App.</p>
+  <p>Simply click the big green button below to verify your email address.</p>
+  <br />
+  <a href="#" target="_blank" style="padding: 12px 24px; border-radius: 4px; color: #FFF; background: #198754; display: inline-block;margin: 0.5rem 0;">Confirm now</a>
+  <br />
+  <br />
+  If you didnt ask to verify this address, you can ignore this email.
+  <br />
+  <br />
+  Thanks,
+  <br />
+  The Curb App team
+</div>
+</div>`;

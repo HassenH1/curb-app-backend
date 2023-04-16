@@ -20,6 +20,7 @@ const userProfileSchema = new Schema<IUserProfile>(
     username: { type: String, unique: true },
     password: { type: String },
     email: { type: String, unique: true },
+    emailVerified: { type: Boolean, default: false },
     firstName: String,
     lastName: String,
     phoneNumber: String,

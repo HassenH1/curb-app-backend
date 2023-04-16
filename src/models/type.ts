@@ -16,6 +16,7 @@ export interface IUserProfile {
   address: IAddress;
   age: number;
   dob: string;
+  emailVerified: boolean;
 }
 
 export interface IAddress {
