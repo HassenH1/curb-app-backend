@@ -98,11 +98,38 @@ class Authentication {
       const verified = await verifyToken(token);
       if (!verified) return res.status(401).send({ message: 'not verified' });
 
-      const data = await models.User.findOne({
-        _id: (verified as JwtPayload)._id,
-      });
+      return res.status(200);
+    } catch (error) {
+      return res.status(403).send({ error });
+    }
+  };
 
-      return res.status(201).json({ data });
+  emailVerificationtokenCheck = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const token = req.params.token;
+      const userId = req.params._id;
+
+      if (!token)
+        return res
+          .status(401)
+          .send({ message: 'Unauthorized: No token provided' });
+
+      const verified = await verifyToken(token);
+      if (!verified) return res.status(401).send({ message: 'not verified' });
+
+      models.User.findOneAndUpdate(
+        { _id: userId },
+        { $set: { profile: { emailVerified: true } } },
+        (err: any) => {
+          if (err) return res.status(500).json({ err });
+
+          return res.status(201).send('Verified!');
+        }
+      );
     } catch (error) {
       return res.status(403).send({ error });
     }

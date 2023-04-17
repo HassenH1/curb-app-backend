@@ -45,19 +45,20 @@ router.get('/:token', (req, res, next) => {
 });
 
 router.get('/verify/email/:token', async (req, res, next) => {
-  const { token } = req.params;
-  const response = await verifyToken(token);
-  models.User.updateOne(
-    { _id: (response as JwtPayload)._id },
-    {
-      $set: {
-        profile: {
-          emailVerified: true,
-        },
-      },
-    }
-  );
-  res.send('success');
+  // const { token } = req.params;
+  // const response = await verifyToken(token);
+  // models.User.updateOne(
+  //   { _id: (response as JwtPayload)._id },
+  //   {
+  //     $set: {
+  //       profile: {
+  //         emailVerified: true,
+  //       },
+  //     },
+  //   }
+  // );
+  // res.send('success');
+  return AuthService.emailVerificationtokenCheck(req, res, next);
 });
 
 export default router;
