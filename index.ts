@@ -1,4 +1,4 @@
-import express, { Express } from 'express';
+import express, { Express, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -32,28 +32,10 @@ app.use(
     extended: true,
   })
 );
-app.use(errorHandler);
 app.use(`${url}/profile`, profileRoute);
 app.use(`${url}/auth`, authRoute);
 app.use(`${url}/car`, carRoute);
-
-/**
- * @todo - remove this, its only a test
- */
-app.get('/', async (req, res) => {
-  try {
-    const mail = new MailService(
-      Object('3'),
-      'Hassen',
-      'hassen@mailinator.com',
-      true
-    );
-    mail.sendMail();
-  } catch (error) {
-    console.log(`${error} MAILER SERVICE IN GET ROUTE ERROR`);
-  }
-  res.json({ message: 'testing response' });
-});
+app.use(errorHandler);
 
 /**
  * @todo - remove this, its only a test

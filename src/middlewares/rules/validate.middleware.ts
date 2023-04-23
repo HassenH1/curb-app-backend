@@ -6,7 +6,11 @@ const validate = (req: Request, res: Response, next: NextFunction) => {
   if (errors.isEmpty()) return next();
 
   const extractedErrors: { [key: string]: any }[] = [];
-  errors.array().map((err) => extractedErrors.push({ [err.param]: err.msg }));
+  errors.array().map((err) => {
+    return extractedErrors.push({
+      ...err,
+    });
+  });
 
   return res.status(422).json({
     errors: extractedErrors,
