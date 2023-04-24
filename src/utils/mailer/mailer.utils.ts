@@ -37,8 +37,8 @@ export default class MailService {
         port: 465,
         secure: true,
         // secure: false, // true for 465, false for other ports
-        // debug: true,
-        // logger: true,
+        debug: true,
+        logger: true,
         auth: {
           user: process.env.PRIVATE_EMAIL_USER,
           pass: process.env.PRIVATE_EMAIL_PASSWORD,
@@ -48,7 +48,7 @@ export default class MailService {
       if (this.shouldGenerateToken) {
         this.generatedToken = await generateAccessToken(
           { _id: this._id },
-          '1m'
+          '5m'
         );
         this.link += `api/v1/auth/verify/email/${this.generatedToken}`;
       }

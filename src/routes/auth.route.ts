@@ -55,7 +55,7 @@ router.get('/verify/email/:token', async (req, res, next) => {
       },
     }
   );
-  res.send('success');
+  res.sendFile('emailValidationSuccess.html', { root: '.' + '/public' });
 });
 
 export default router;
