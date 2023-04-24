@@ -47,24 +47,4 @@ const loginValidationRules = () => {
   ];
 };
 
-// const updateProfileValidationRules = () => {
-//   return [
-//     oneOf([
-//       check("email").exists().withMessage("email is required"),
-//       check("username").exists().withMessage("username is required"),
-//       check("password").isNumeric().withMessage("password should be a number"),
-//       check("firstName").exists().withMessage("firstName is required"),
-//       check("lastName").exists().withMessage("lastName is required"),
-//       check("address").exists().withMessage("address is required"),
-//       check("phoneNumber").exists().withMessage("phoneNumber is required"),
-//       check("dob").exists().withMessage("dob is required"),
-//       check("age").exists().withMessage("age is required"),
-//     ]),
-//   ];
-// };
-
-export {
-  signupValidationRules,
-  loginValidationRules,
-  // updateProfileValidationRules,
-};
+export { signupValidationRules, loginValidationRules };

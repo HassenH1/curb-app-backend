@@ -6,9 +6,6 @@ const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  console.log(
-    'INSIDE ERROR HANDLER FUNCTION<==================================='
-  );
   const statusCode: number = error.statusCode || 500;
   console.error(error.message, error.stack);
   return res.status(statusCode).json({ message: error.message });

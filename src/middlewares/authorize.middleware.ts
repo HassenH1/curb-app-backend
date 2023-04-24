@@ -14,9 +14,7 @@ export const authenticateJWT = async (
         .send({ message: 'Unauthorized: No token provided' });
     const verified = await verifyToken(token);
     if (!verified)
-      return res
-        .status(400)
-        .send({ message: 'Unauthorized: Cannot/not verified' });
+      return res.status(400).send({ message: 'Unauthorized: Cannot verified' });
     next();
   } catch (error) {
     return res.status(403).send({ message: 'Unauthorized: Invalid token' });

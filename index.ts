@@ -1,4 +1,4 @@
-import express, { Express, NextFunction } from 'express';
+import express, { Express } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -9,7 +9,6 @@ import errorHandler from './src/middlewares/errorhandler.middleware';
 import { authenticateJWT } from './src/middlewares/authorize.middleware';
 dotenv.config();
 import './src/db/connection';
-import MailService from './src/utils/mailer/mailer.utils';
 
 const app: Express = express();
 const port = process.env.PORT;
