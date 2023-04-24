@@ -9,13 +9,14 @@ import errorHandler from './src/middlewares/errorhandler.middleware';
 import { authenticateJWT } from './src/middlewares/authorize.middleware';
 dotenv.config();
 import './src/db/connection';
+import MailService from './src/utils/mailer/mailer.utils';
+import { Schema } from 'mongoose';
 
 const app: Express = express();
 const port = process.env.PORT;
 const url = '/api/v1';
 
 app.use(cookieParser());
-
 /**
  * @todo - update cors with options object
  */
@@ -35,6 +36,20 @@ app.use(`${url}/profile`, profileRoute);
 app.use(`${url}/auth`, authRoute);
 app.use(`${url}/car`, carRoute);
 app.use(errorHandler);
+
+app.get('/email-test', (req, res) => {
+  const mail = new MailService(
+    // new ObjectId('640d2e0129b35264a8d561e5'),
+    // new ObjectId('640d2e0129b35264a8d561e5'),
+    new Schema.Types.ObjectId('640d2e0129b35264a8d561e5'),
+    'Hassen Hassen',
+    'hassen@mailinator.com',
+    true
+  );
+  mail.sendMail();
+
+  res.send('Email is sent!!');
+});
 
 /**
  * @todo - remove this, its only a test
