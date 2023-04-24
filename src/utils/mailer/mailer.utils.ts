@@ -1,5 +1,5 @@
-import { ObjectId, Schema } from 'mongoose';
-import nodemailer, { Transporter, SentMessageInfo } from 'nodemailer';
+import { Schema } from 'mongoose';
+import nodemailer, { Transporter } from 'nodemailer';
 import { generateAccessToken } from '../jwt/jwt.utils';
 
 /**
