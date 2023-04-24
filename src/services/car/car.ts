@@ -7,7 +7,7 @@ class CarService {
       const cars = await models.Car.find({ userId: req.params.userId });
       res.status(200).json({ cars });
     } catch (error) {
-      throw new Error(`${error} error getting cars`);
+      next(error);
     }
   };
   getACar = (req: Request, res: Response, next: NextFunction) => {
@@ -17,7 +17,7 @@ class CarService {
         res.status(200).json(car);
       });
     } catch (error) {
-      throw new Error(`${error} error getting a car`);
+      next(error);
     }
   };
   addCar = (req: Request, res: Response, next: NextFunction) => {
@@ -28,7 +28,7 @@ class CarService {
         return res.status(201).json({ data });
       });
     } catch (error) {
-      throw new Error(`${error} adding car`);
+      next(error);
     }
   };
   deleteCar = (req: Request, res: Response, next: NextFunction) => {
@@ -54,7 +54,7 @@ class CarService {
       );
       res.status(200).json(update);
     } catch (error) {
-      throw new Error(`${error} error updating car`);
+      next(error);
     }
   };
 }

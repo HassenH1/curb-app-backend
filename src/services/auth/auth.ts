@@ -7,7 +7,6 @@ import {
 } from '../../utils/bcrypt/bcrypt.utils';
 import { generateAccessToken, verifyToken } from '../../utils/jwt/jwt.utils';
 import MailService from '../../utils/mailer/mailer.utils';
-import sendVerificationEmail from '../../utils/mailer/mailer.utils';
 
 class Authentication {
   login = async (req: Request, res: Response, next: NextFunction) => {
@@ -37,40 +36,44 @@ class Authentication {
       // sameSite: true
       // })
     } catch (error: any) {
-      throw new Error(error);
+      next(error);
     }
   };
 
   signup = async (req: Request, res: Response, next: NextFunction) => {
-    const hash = hashPassword(req.body.password);
+    try {
+      const hash = hashPassword(req.body.password);
 
-    const userProfile = new models.User({
-      profile: {
-        ...req.body,
-        password: hash,
-      },
-    });
+      const userProfile = new models.User({
+        profile: {
+          ...req.body,
+          password: hash,
+        },
+      });
 
-    userProfile.save(async (err, data) => {
-      if (err) return res.status(500).json({ err });
-      const token = await generateAccessToken({ _id: data._id });
-      if (!token)
-        return res.status(400).send({ error: 'cannot generate token' });
+      userProfile.save(async (err, data) => {
+        if (err) return res.status(500).json({ err });
+        const token = await generateAccessToken({ _id: data._id });
+        if (!token)
+          return res.status(400).send({ error: 'cannot generate token' });
 
-      const mail = new MailService(
-        data._id,
-        ((data.profile?.firstName.charAt(0).toUpperCase() as string) +
-          data.profile?.firstName.slice(1)) as string,
-        data.profile?.email as string
-      );
-      mail.sendMail();
-      return res.status(201).json({ data, token });
-      // .cookie("token", token, {
-      // httpOnly: true,
-      // secure: true,
-      // sameSite: true
-      // })
-    });
+        const mail = new MailService(
+          data._id,
+          ((data.profile?.firstName.charAt(0).toUpperCase() as string) +
+            data.profile?.firstName.slice(1)) as string,
+          data.profile?.email as string
+        );
+        mail.sendMail();
+        return res.status(201).json({ data, token });
+        // .cookie("token", token, {
+        // httpOnly: true,
+        // secure: true,
+        // sameSite: true
+        // })
+      });
+    } catch (error) {
+      next(error);
+    }
   };
 
   /**

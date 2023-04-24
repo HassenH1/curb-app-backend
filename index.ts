@@ -9,7 +9,6 @@ import errorHandler from './src/middlewares/errorhandler.middleware';
 import { authenticateJWT } from './src/middlewares/authorize.middleware';
 dotenv.config();
 import './src/db/connection';
-import MailService from './src/utils/mailer/mailer.utils';
 
 const app: Express = express();
 const port = process.env.PORT;
@@ -32,28 +31,10 @@ app.use(
     extended: true,
   })
 );
-app.use(errorHandler);
 app.use(`${url}/profile`, profileRoute);
 app.use(`${url}/auth`, authRoute);
 app.use(`${url}/car`, carRoute);
-
-/**
- * @todo - remove this, its only a test
- */
-app.get('/', async (req, res) => {
-  try {
-    const mail = new MailService(
-      Object('3'),
-      'Hassen',
-      'hassen@mailinator.com',
-      true
-    );
-    mail.sendMail();
-  } catch (error) {
-    console.log(`${error} MAILER SERVICE IN GET ROUTE ERROR`);
-  }
-  res.json({ message: 'testing response' });
-});
+app.use(errorHandler);
 
 /**
  * @todo - remove this, its only a test
