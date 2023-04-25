@@ -33,6 +33,7 @@ const updateUserValidationRules = () => {
       body('profile.firstName').optional().not().isEmpty().trim(),
       body('profile.lastName').optional().not().isEmpty().trim(),
       body('profile.phoneNumber').optional().not().isEmpty().trim(),
+      body('profile.emailVerified').optional().not().isEmpty().isBoolean(),
     ]),
   ];
 };

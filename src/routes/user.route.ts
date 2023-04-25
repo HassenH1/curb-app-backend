@@ -5,6 +5,7 @@ import { IUser } from '../models/type';
 import models from '../models/model';
 import { updateUserValidationRules } from '../middlewares/rules/userValidationRules.middleware';
 import validate from '../middlewares/rules/validate.middleware';
+import { IUserProfile } from '../models/type';
 
 const router: Router = express.Router();
 
@@ -29,32 +30,30 @@ router.patch(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = await models.User.findById(req.body._id);
-      console.log(user, '<==============WHAT IS USER NAME?');
       if (!user) return res.status(401).json({ message: 'Unauthorized.' });
       if (req.body.profile['password']) {
         //add hash logic
       }
-      user.profile = req.body.profile;
-      user.save((saveErr: CallbackError, updatedUser: IUser) => {
-        if (saveErr) return res.status(400).send(saveErr);
-        res.send({ updatedUser });
-      });
+      const query: { $set: { profile: { [key: string]: any } } } = {
+        $set: { profile: {} },
+      };
+      for (let key in req.body.profile) {
+        if (
+          user.profile &&
+          user.profile[key as keyof IUserProfile] !== req.body.profile[key]
+        ) {
+          query.$set.profile[key] = req.body.profile[key];
+        }
+      }
+      const updatedUser = await models.User.findByIdAndUpdate(
+        { _id: req.body._id },
+        query,
+        { new: true }
+      ).exec();
+      res.status(200).json({ data: updatedUser });
     } catch (error) {
       next(error);
     }
-    // console.log('INSIDE PATCH METHOD RIGHT?');
-    // console.log(req.body, '<=======WHAT IS REQ BODY HERE?');
-    // models.User.findById(req.body._id, (err: CallbackError, user: any) => {
-    //   if (err) return res.status(404).send(err);
-    //   if (req.body.profile['password']) {
-    //     //add hash logic
-    //   }
-    //   user.profile?.set(req.body.profile);
-    //   user.save((saveErr: CallbackError, updatedUser: IUser) => {
-    //     if (saveErr) return res.status(400).send(saveErr);
-    //     res.send({ updatedUser });
-    //   });
-    // }).catch((error) => next(error));
   }
 );
 
