@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRoute from './src/routes/auth.route';
-import profileRoute from './src/routes/user.route';
+import userRoute from './src/routes/user.route';
 import carRoute from './src/routes/car.route';
 import errorHandler from './src/middlewares/errorhandler.middleware';
 import { authenticateJWT } from './src/middlewares/authorize.middleware';
@@ -30,7 +30,7 @@ app.use(
     extended: true,
   })
 );
-app.use(`${url}/profile`, profileRoute);
+app.use(`${url}/user`, userRoute);
 app.use(`${url}/auth`, authRoute);
 app.use(`${url}/car`, carRoute);
 app.use(errorHandler);

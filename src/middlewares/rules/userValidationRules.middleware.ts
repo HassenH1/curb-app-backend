@@ -8,15 +8,14 @@ const exactBodyCheck = (body: Array<any>) => {
 
 const updateUserValidationRules = () => {
   return [
-    body('_id').not().isEmpty().trim().withMessage('_id is required'),
     exactBodyCheck([
-      body('profile.username')
+      body('username')
         .optional()
         .not()
         .isEmpty()
         .trim()
         .withMessage('Must be unique'),
-      body('profile.email')
+      body('email')
         .optional()
         .isEmail()
         .normalizeEmail()
@@ -24,16 +23,11 @@ const updateUserValidationRules = () => {
         .isEmpty()
         .trim()
         .withMessage('Must be unique'),
-      body('profile.password')
-        .optional()
-        .isLength({ min: 5 })
-        .not()
-        .isEmpty()
-        .trim(),
-      body('profile.firstName').optional().not().isEmpty().trim(),
-      body('profile.lastName').optional().not().isEmpty().trim(),
-      body('profile.phoneNumber').optional().not().isEmpty().trim(),
-      body('profile.emailVerified').optional().not().isEmpty().isBoolean(),
+      body('password').optional().isLength({ min: 5 }).not().isEmpty().trim(),
+      body('firstName').optional().not().isEmpty().trim(),
+      body('lastName').optional().not().isEmpty().trim(),
+      body('phoneNumber').optional().not().isEmpty().trim(),
+      body('emailVerified').optional().not().isEmpty().isBoolean(),
     ]),
   ];
 };

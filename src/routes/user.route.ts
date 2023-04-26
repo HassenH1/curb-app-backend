@@ -1,19 +1,19 @@
 import express, { Router, Request, Response, NextFunction } from 'express';
 import { CallbackError } from 'mongoose';
 import { authenticateJWT } from '../middlewares/authorize.middleware';
-import { IUser } from '../models/type';
 import models from '../models/model';
 import { updateUserValidationRules } from '../middlewares/rules/userValidationRules.middleware';
 import validate from '../middlewares/rules/validate.middleware';
 import { IUserProfile } from '../models/type';
+import { hashPassword } from '../utils/bcrypt/bcrypt.utils';
 
 const router: Router = express.Router();
 
-router.get('/user/:id', async (req, res, next) => {
+router.get('/:id', async (req, res, next) => {
   try {
     const user = await models.User.find({ _id: req.params.id }).exec();
     if (!user) return res.status(401).json({ message: 'Unauthorized.' });
-    res.status(200).json(user);
+    res.status(200).json({ data: user });
   } catch (error) {
     next(error);
   }
@@ -23,34 +23,26 @@ router.get('/user/:id', async (req, res, next) => {
  * @todo = this is not working right
  */
 router.patch(
-  '/user',
+  '/profile/:id',
   authenticateJWT,
   updateUserValidationRules(),
   validate,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = await models.User.findById(req.body._id);
-      if (!user) return res.status(401).json({ message: 'Unauthorized.' });
-      if (req.body.profile['password']) {
-        //add hash logic
+      const doc = await models.User.findOne({ _id: req.params.id });
+      if (!doc) return res.status(400).json({ message: 'cannot find user' });
+
+      if (req.body['password']) {
+        const hash = hashPassword(req.body['password']);
+        req.body['password'] = hash;
       }
-      const query: { $set: { profile: { [key: string]: any } } } = {
-        $set: { profile: {} },
-      };
-      for (let key in req.body.profile) {
-        if (
-          user.profile &&
-          user.profile[key as keyof IUserProfile] !== req.body.profile[key]
-        ) {
-          query.$set.profile[key] = req.body.profile[key];
+      for (const key in req.body) {
+        if (doc && doc.profile) {
+          doc.profile[key] = req.body[key];
         }
       }
-      const updatedUser = await models.User.findByIdAndUpdate(
-        { _id: req.body._id },
-        query,
-        { new: true }
-      ).exec();
-      res.status(200).json({ data: updatedUser });
+      await doc?.save();
+      res.status(201).json({ data: doc });
     } catch (error) {
       next(error);
     }
